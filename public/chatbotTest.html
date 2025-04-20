@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+</head>
+<body>
+    <h2>Tech LMS Chatbot</h2>
+    <input type="text" id="question" placeholder="Ask a question..." />
+    <button onclick="ask()">Ask</button>
+    <p id="response"></p>
+
+    <script>
+        async function ask() {
+            const question = document.getElementById('question').value;
+
+            const response = await fetch('/api/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ question })
+            });
+
+            const data = await response.json();
+            document.getElementById('response').innerText = data.answer;
+        }
+    </script>
+</body>
+</html>
