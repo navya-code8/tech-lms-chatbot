@@ -30,8 +30,11 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage
 
-# Expose port (Render listens on 10000 by default)
-EXPOSE 8000
+# Set environment to production
+ENV APP_ENV=production
 
-# Start Laravel server
-CMD php artisan serve --host=0.0.0.0 --port=8000
+# Expose port (Render uses 10000 internally)
+EXPOSE 10000
+
+# Laravel serve command for Render
+CMD php artisan serve --host=0.0.0.0 --port=10000
