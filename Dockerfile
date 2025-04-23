@@ -1,37 +1,36 @@
-# Use the official PHP image with necessary extensions
 FROM php:8.2-fpm
 
-# Set working directory
-WORKDIR /var/www
-
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    nginx \
+    curl \
+    git \
+    unzip \
     libpng-dev \
     libjpeg-dev \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip \
-    curl \
-    git \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy existing application directory contents
+COPY . .
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copy project files
-COPY . .
-
-# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Laravel specific: set permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
+# Copy nginx config
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Expose port (Render listens on 80 by default for Nginx)
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Expose port 80
 EXPOSE 80
 
-# Start PHP-FPM (handled by Nginx)
-CMD ["php-fpm"]
+# Start Nginx and PHP-FPM
+CMD service nginx start && php-fpm
