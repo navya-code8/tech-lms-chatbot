@@ -31,3 +31,9 @@ EXPOSE 80
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
+
+# Make storage and bootstrap/cache directories writable
+RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
