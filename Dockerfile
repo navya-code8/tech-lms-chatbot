@@ -26,6 +26,9 @@ RUN composer install
 # Permissions
 RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
+# Create necessary log directories
+RUN mkdir -p /var/log/php-fpm
+
 # Expose port for web
 EXPOSE 80
 
