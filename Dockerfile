@@ -40,3 +40,7 @@ RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
 # Make storage and bootstrap/cache directories writable
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+RUN ls -la /usr/sbin/ && which php-fpm && php -v
+
+RUN ls -la /usr/sbin/ && which php-fpm && php -v
