@@ -18,3 +18,5 @@ require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 $app->handleRequest(Request::capture());
+
+file_put_contents('/var/www/html/storage/logs/debug.log', 'index.php hit at ' . now() . PHP_EOL, FILE_APPEND);
