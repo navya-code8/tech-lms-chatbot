@@ -43,4 +43,4 @@ RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 RUN ls -la /usr/sbin/ && which php-fpm && php -v
 
-RUN ls -la /usr/sbin/ && which php-fpm && php -v
+RUN php -v
