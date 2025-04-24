@@ -1,6 +1,9 @@
 FROM php:8.2-fpm
 
-# Install required packages and PHP extensions
+# Set non-interactive mode so apt doesn't hang
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
@@ -10,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql zip mbstring tokenizer xml
+    && docker-php-ext-install pdo pdo_mysql zip mbstring tokenizer xml \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /var/www
