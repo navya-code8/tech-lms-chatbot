@@ -12,37 +12,43 @@ class ChatbotController extends Controller
     {
         $userQuestion = $request->input('question');
 
-        //load FAQs from JSON
-        $faqData = json_decode(file_get_contents(storage_path('app/faqs.json')), true);
-
-        //build the OpenAI prompt
-        $prompt = "User asked: \"$userQuestion\". Choose the most relevant FAQ from below and respond ONLY with the FAQ answer:\n\n";
-        foreach ($faqData as $faq) {
-            $prompt .= "Q: " . $faq['question'] . "\nA: " . $faq['answer'] . "\n\n";
+        if (!$userQuestion) {
+            return response()->json(['error' => 'Question is required'], 400);
         }
 
-        //create the OpenAI client
-        $client = OpenAI::factory()
-            ->withApiKey(env('OPENAI_API_KEY'))
-            ->withHttpClient(new Client([
-                'verify' => env('OPENAI_CACERT'), 
-            ]))
-            ->make();
+        try {
+            $faqData = json_decode(file_get_contents(storage_path('app/faqs.json')), true);
 
-        //get a response from OpenAI
-        $response = $client->chat()->create([
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                ['role' => 'system', 'content' => 'You are a helpful FAQ assistant for a Tech LMS.'],
-                ['role' => 'user', 'content' => $prompt],
-            ],
-        ]);
+            $prompt = "User asked: \"$userQuestion\". Choose the most relevant FAQ from below and respond ONLY with the FAQ answer:\n\n";
+            foreach ($faqData as $faq) {
+                $prompt .= "Q: " . $faq['question'] . "\nA: " . $faq['answer'] . "\n\n";
+            }
 
-        $botAnswer = $response->choices[0]->message->content;
+            $client = OpenAI::factory()
+                ->withApiKey(env('OPENAI_API_KEY'))
+                ->withHttpClient(new Client([
+                    'verify' => env('OPENAI_CACERT', false), // default to false
+                ]))
+                ->make();
 
-        return response()->json([
-            'question' => $userQuestion,
-            'answer' => $botAnswer
-        ]);
+            $response = $client->chat()->create([
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a helpful FAQ assistant for a Tech LMS.'],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+            ]);
+
+            $botAnswer = $response->choices[0]->message->content ?? 'No response from AI.';
+
+            return response()->json([
+                'question' => $userQuestion,
+                'answer' => $botAnswer
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
     }
+
 }
