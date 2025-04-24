@@ -27,7 +27,7 @@ class ChatbotController extends Controller
             $client = OpenAI::factory()
                 ->withApiKey(env('OPENAI_API_KEY'))
                 ->withHttpClient(new Client([
-                    'verify' => env('OPENAI_CACERT', false), // default to false
+                    'verify' => false
                 ]))
                 ->make();
 
