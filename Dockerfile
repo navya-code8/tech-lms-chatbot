@@ -25,8 +25,9 @@ USER laravel
 # Copy composer files and install dependencies
 COPY composer.json composer.lock ./
 
-# Change installation directory to a writable location
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/var/www/.composer --filename=composer \
+# Create the composer directory and change installation directory to a writable location
+RUN mkdir -p /var/www/.composer \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/var/www/.composer --filename=composer \
     && /var/www/.composer/composer install --no-dev --optimize-autoloader
 
 # Copy the rest of the app
